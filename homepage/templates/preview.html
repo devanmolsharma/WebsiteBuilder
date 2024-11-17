@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'output.css' %}" rel="stylesheet">
+    <title>Website Builder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.5/css/lightbox.min.css"
+        integrity="sha512-xtV3HfYNbQXS/1R1jP53KbFcU9WXiSA1RFKzl5hRlJgdOJm4OxHCWYpskm6lN0xp0XtKGpAfVShpbvlFH3MDAA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div class="container mx-auto p-6">
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Website Builder</h1>
+            <p class="text-gray-500 mt-2 text-lg">Create your professional website effortlessly.</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <!-- Image Section -->
+            <a href="{% static 'idea.png' %}" data-lightbox="Design"
+                class="relative flex justify-center bg-gray-100 p-4">
+                <img src="{% static 'idea.png' %}" alt="Website Idea" class="w-2/3 max-w-sm rounded-md shadow-sm">
+            </a>
+            <!-- Text Section -->
+            <div class="p-8">
+                <p class="text-gray-700 text-lg leading-relaxed">{{ idea }}</p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-10 text-center">
+            <div class="flex mx-auto justify-start gap-4">
+                <button id="nextStepButton"
+                    class="bg-blue-600 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-blue-700 focus:ring focus:ring-blue-300 transition">
+                    Start Processing
+                </button>
+                <button id="nextStepButton"
+                    class="bg-yellow-600 text-white px-8 py-3 rounded-lg shadow-lg hover:bg-yellow-700 focus:ring focus:ring-blue-300 transition"
+                    onclick="location.reload()">
+                    Generate New
+                </button>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="progressContainer" class="hidden mt-4">
+                <div class="relative w-3/4 mx-auto bg-gray-200 rounded-full h-4">
+                    <div id="progressBar" class="absolute bg-blue-600 h-4 rounded-full" style="width: 0%;"></div>
+                </div>
+                <p id="progressText" class="mt-2 text-gray-500 text-sm">Loading...</p>
+            </div>
+
+            <!-- After processing options -->
+            <div id="afterProcessing" class="hidden m-4">
+                <!-- download as html -->
+                <a href="output" class="text-blue-600 hover:underline">View as HTML</a>
+                <!-- download assets -->
+                <a href="{% static 'assets.zip' %}" class="text-blue-600 hover:underline">Download Assets and
+                    Website</a>
+                <!-- Download as JSON -->
+                <a href="{% static 'layout.json' %}" class="text-blue-600 hover:underline">Download JSON layout</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('nextStepButton').addEventListener('click', async () => {
+            // Show the progress bar
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            progressContainer.classList.remove('hidden');
+
+            try {
+                // Simulate progress for the loading bar
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 0.1;
+                    progressBar.style.width = `${progress}%`;
+                    progressText.textContent = `Loading... ${Math.round(progress)}%`;
+                    if (progress >= 100) clearInterval(progressInterval);
+                }, 200);
+
+                // Make the GET request
+                const response = await fetch('/render');
+                if (!response.ok) {
+                    throw new Error('Failed to load data');
+                }
+
+                // Handle successful response
+                const data = await response.text();
+                // location.href = location.origin + '/output'
+                document.getElementById('afterProcessing').classList.remove('hidden');
+            } catch (error) {
+                // Handle errors
+                console.error(error);
+                progressText.textContent = "An error occurred. Please try again.";
+            } finally {
+                // Simulate completion after a short delay
+                setTimeout(() => {
+                    progressContainer.classList.add('hidden');
+                }, 1000);
+            }
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.5/js/lightbox.min.js"
+        integrity="sha512-KbRFbjA5bwNan6DvPl1ODUolvTTZ/vckssnFhka5cG80JVa5zSlRPCr055xSgU/q6oMIGhZWLhcbgIC0fyw3RQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</body>
+
+</html>
